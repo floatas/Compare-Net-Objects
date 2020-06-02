@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using KellermanSoftware.CompareNetObjects.Reports;
+using KellermanSoftware.CompareNetObjectsTests.TestClasses.HashBug;
 using Newtonsoft.Json;
 using Point = System.Drawing.Point;
 
@@ -49,6 +50,72 @@ namespace KellermanSoftware.CompareNetObjectsTests
         #endregion
 
         #region Tests
+
+        [Test]
+        public void SimpleArrayTest()
+        {
+            var compareLogic = new CompareLogic();
+            compareLogic.Config.IgnoreCollectionOrder = true;
+            compareLogic.Config.MaxDifferences = Int32.MaxValue;
+            ComparisonResult result = compareLogic.Compare(new[] { "one" }, new[] { "two" });
+            Console.WriteLine(result.DifferencesString);
+        }
+
+        [Test]
+        public void HashBugTest()
+        {
+            var c = new HashBugC()
+            {
+                Text = "I'm C"
+            };
+
+            var b = new HashBugB()
+            {
+                Text = "I'm B",
+                CollectionOfC = new List<HashBugC>()
+                {
+                    c
+                }
+            };
+
+            var b2 = new HashBugB()
+            {
+                Text = "I'm B",
+                CollectionOfC = new List<HashBugC>()
+                {
+                    c
+                }
+            };
+
+            var comparisonResult = b == b2;
+
+            Assert.IsTrue(comparisonResult);
+        }
+
+        [Test]
+        public void DotsAndTabsShouldFormatCorrectly()
+        {
+            List<DotsAndTabs> groundTruth = new List<DotsAndTabs>();
+            List<DotsAndTabs> newResult = new List<DotsAndTabs>();
+
+            groundTruth.Add(new DotsAndTabs { boo = "hello", gg = "hello again" });
+            groundTruth.Add(new DotsAndTabs  { boo = "scorpio \t. .\r\n11-nov", gg = "hello again2" });
+            newResult.Add(new DotsAndTabs  { boo = "hello", gg = "hello again" });
+            newResult.Add(new DotsAndTabs  { boo = "  .....  ", gg = "hello again2" });
+
+            CompareLogic compareLogicObject = new CompareLogic();
+            compareLogicObject.Config.MaxDifferences = int.MaxValue;
+            compareLogicObject.Config.IgnoreCollectionOrder = true;
+
+            ComparisonResult assertionResult = compareLogicObject.Compare(groundTruth, newResult);
+
+            Console.WriteLine(assertionResult.DifferencesString + "\n\n\n");
+
+            UserFriendlyReport friendlyReport = new UserFriendlyReport();
+
+            Console.WriteLine(friendlyReport.OutputString(assertionResult.Differences));
+
+        }
 
         [Test]
         public void ComparingListsOfNullWhileIgnoringCollectionOrderShouldNotThrowObjectReferenceError()
@@ -135,36 +202,7 @@ namespace KellermanSoftware.CompareNetObjectsTests
             Assert.IsTrue(differences.AreEqual);
         }
 
-#if !NETSTANDARD
-        [Test]
-        public void SaveAndLoadConfig()
-        {
-            //This is the comparison class
-            CompareLogic compareLogic = new CompareLogic();
-            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json");
 
-            compareLogic.SaveConfiguration(filePath);
-            compareLogic.LoadConfiguration(filePath);
-
-
-            //Create a couple objects to compare
-            Person person1 = new Person();
-            person1.DateCreated = DateTime.Now;
-            person1.Name = "Greg";
-
-            Person person2 = new Person();
-            person2.Name = "John";
-            person2.DateCreated = person1.DateCreated;
-
-            ComparisonResult result = compareLogic.Compare(person1, person2);
-
-            //These will be different, write out the differences
-            if (!result.AreEqual)
-                Console.WriteLine(result.DifferencesString);
-            else
-                Console.WriteLine("Objects are the same");
-        }
-#endif
 
         [Test]
         public void When_CompareDateTimeOffsetWithOffsets_Is_False_Do_Not_Compare_Offsets()

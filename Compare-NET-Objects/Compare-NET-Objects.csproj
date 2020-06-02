@@ -19,13 +19,16 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageTags>compare comparison equality equal deep objects difference compareobjects deepequal deepequals</PackageTags>
     <Description>What you have been waiting for. Perform a deep compare of any two .NET objects using reflection. Shows the differences between the two objects.</Description>
-    <Authors>KellermanSoftware</Authors>
-    <Version>4.63.0</Version>
-    <AssemblyVersion>4.63.0.0</AssemblyVersion>
+    <Authors>rte</Authors>
+    <Version>4.66.0</Version>
+    <AssemblyVersion>4.66.0.0</AssemblyVersion>
     <NeutralLanguage>en-US</NeutralLanguage>    
     <Company>Kellerman Software</Company>
-    <PackageReleaseNotes>NuGet Builds for .NET Framework 4.7, 4.7.1, 4.7.2, and 4.8</PackageReleaseNotes>
-    <Copyright>Copyright © 2019 Kellerman Software</Copyright>
+    <PackageReleaseNotes>Improve IgnoredByAttributePerformance by ocoanet
+
+Added Config.UseHashCodeIdentifier for fix https://github.com/GregFinzer/Compare-Net-Objects/issues/192</PackageReleaseNotes>
+    <Copyright>Copyright © 2020 Kellerman Software</Copyright>
+    <FileVersion>4.66.0.0</FileVersion>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
